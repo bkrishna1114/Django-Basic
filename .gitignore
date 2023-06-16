@@ -1,0 +1,44 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDE-specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Dependency directories
+lib/
+lib64/
+bin/
+include/
+
+# Compiled Python modules
+*.pyd
+*.so
+*.dll
+
+# Miscellaneous
+*.swp
+*~
+
+PiPfile
+PiPfile.lock
