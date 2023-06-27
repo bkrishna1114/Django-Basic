@@ -11,5 +11,11 @@
     {%else%}
     <h1>Hellow World</h1>
     {%endif%}
+    
+    <uL>
+        {% for product in products %}
+        <li>{{product.title}}</li>
+        {% endfor%}
+    </ul>
 </body>
 </html>
