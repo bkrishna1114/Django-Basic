@@ -9,14 +9,16 @@
     {% if name %}
     <h1> Hello {{name}}</h1>
     {%else%}
-    <h1>Hellow World</h1>
+    <h1>Hello World</h1>
     {%endif%}
     
     <uL>
         {% for order in orders %}
         <!-- <li>{{product.title}} -  {{ product.collection.title }}</li> -->
-        <li>{{ order.id }} -- {{order.customer.first_name}} </li>
+        <li>{{ order.id }} -- {{order.customer.full_name}} </li>
         {% endfor%} 
+
     </ul>
+    <!-- {{orders.first_name}} -->
 </body>
 </html>
