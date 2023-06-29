@@ -13,9 +13,10 @@
     {%endif%}
     
     <uL>
-        {% for product in products %}
-        <li>{{product.title}}</li>
-        {% endfor%}
+        {% for order in orders %}
+        <!-- <li>{{product.title}} -  {{ product.collection.title }}</li> -->
+        <li>{{ order.id }} -- {{order.customer.first_name}} </li>
+        {% endfor%} 
     </ul>
 </body>
 </html>
