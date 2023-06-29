@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from store.models import *
 from django.db.models import Q,F
+from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
+from django.db.models import Value,Func
+from django.db.models.functions import Concat
+
 
 # Create your views here.
 
@@ -78,10 +82,27 @@ def hello(request):
     # queryset = Product.objects.prefetch_related('promotions').select_related('collection').all() #prefetch the results...
 
     #GEt the last 5 orders with their customer and items(incl product)
-    queryset = Order.objects.select_related('customer').prefetch_related('orderitem_set__product')\
-                                                    .order_by('-placed_at')[0:5]
+    # queryset = Order.objects.select_related('customer').prefetch_related('orderitem_set__product').order_by('-placed_at')[0:5]
 
-    return render(request,template_name='hello.html',context={'orders':list(queryset)})
+    #aggrigate... functions..
+    
+    # agg = Product.objects.filter(collection__id=4).aggregate(Count('id'),Sum('unit_price'))
+    # agg = Product.objects.aggregate(Avg('id'))
+    # agg = Product.objects.aggregate(StdDev('unit_price'))
+    # agg = Product.objects.aggregate(Variance('id'))
+    
+    
+    #annotations...
+    # queryset = Customer.objects.annotate(is_new=Value(True)) #this will add the new column called is_new=True
+    queryset = Customer.objects.annotate(new_id=F('id') + 5)
+    
+    
+    #Func
+    # queryset = Customer.objects.annotate(full_name=Func(F('first_name'), Value(' '), F('last_name'),function='CONCAT'))
+    queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
+
+
+    return render(request,template_name='hello.html',context={'orders':queryset})
 
 
 def practice(request):
@@ -106,6 +127,7 @@ def practice(request):
 
     #    Get all customers who have placed an order:
     queryset = Customer.objects.filter(order__isnull=False).distinct()
+    
 
     return render(request,'practice.html',status=200,context={'data':list(queryset)})
  
