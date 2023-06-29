@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from store.models import Product
+from store.models import *
+from django.db.models import Q,F
 
 # Create your views here.
 
@@ -39,9 +40,72 @@ def hello(request):
     # queryset = Product.objects.filter(collection_id=4)
     # queryset = Product.objects.filter(collection_id=4)
     # queryset = Product.objects.filter(collection_id=4)[0:5]
-    queryset = Product.objects.filter(collection_id=4).order_by('last_update')
-    return render(request,template_name='hello.html',context={'products':list(queryset)})
+    # queryset = Product.objects.filter(collection_id=4).order_by('last_update')
+    #multiple conditions..
+    # queryset = Product.objects.filter(Q(unit_price__lte=30) & ~Q(unit_price__gte=20))
+    # queryset = Product.objects.filter(Q(unit_price__lte=30) | ~Q(unit_price__gte=20))
+
+    #comparing....referencing the fields...
+    # queryset = Product.objects.filter(inventory = F('unit_price'))
+    # queryset = Product.objects.filter(inventory__lt = F('unit_price'))
+    # queryset = Product.objects.filter(inventory__gt = F('unit_price'))
+
+    #sorting data....
+    # queryset = Product.objects.order_by('title')
+    # queryset = Product.objects.order_by('unit_price','-title')
+    # queryset = Product.objects.order_by('unit_price','-title').reverse() #it will recerse the queries...
+    # product = Product.objects.earliest('unit_price')
+    # product = Product.objects.latest('unit_price')
+
+    #limitig the results...
+    # queryset = Product.objects.all()[10:15] 
+
+    #selecting fields to queqy..
+    # queryset = Product.objects.all()[10:15].values('id','title')
+    # queryset = Product.objects.values('id','title','collection__title') #inner join
+    #select products that have been ordered and sort them by title...
+    # queryset =Product.objects.filter(id__in= OrderItem.objects.values('product_id').distinct()).order_by('title')
+
+    #deffering method..
+    # queryset = Product.objects.only('id','title')
+    # queryset = Product.objects.defer('description')
+
+    #select realated objects --(---- joins...)
+    # queryset = Product.objects.select_related('collection').all()
+
+    #prefetch method...()
+    # queryset = Product.objects.prefetch_related('promotions').all() #prefetch the results...
+    # queryset = Product.objects.prefetch_related('promotions').select_related('collection').all() #prefetch the results...
+
+    #GEt the last 5 orders with their customer and items(incl product)
+    queryset = Order.objects.select_related('customer').prefetch_related('orderitem_set__product')\
+                                                    .order_by('-placed_at')[0:5]
+
+    return render(request,template_name='hello.html',context={'orders':list(queryset)})
 
 
-#Models......
+def practice(request):
+    #get the all promotions data..
+    # queryset = Promotion.objects.all()
+
+    #get specfic product of ow matching...
+    # queryset = Product.objects.get(id=2)
+
+    #filtering ...
+    # queryset = Customer.objects.filter(membership='B')
+
+    #getting all prducts with price grater then $50
+    # queryset = Product.objects.filter(~Q(collection__id=4)| Q(unit_price__lt=50))
+
+    #gettinga all orders firstname and email..
+    # queryset = Order.objects.select_related('customer').values('id','customer__first_name','customer__email')
+
+    #Get the total quantity of a specific product sold across all orders:
+    # queryset = OrderItem.objects.filter(product=8).aggregate(quantity=models.Sum('quantity'))
+
+
+    #    Get all customers who have placed an order:
+    queryset = Customer.objects.filter(order__isnull=False).distinct()
+
+    return render(request,'practice.html',status=200,context={'data':list(queryset)})
  
