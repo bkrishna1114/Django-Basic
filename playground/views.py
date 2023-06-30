@@ -3,9 +3,10 @@ from django.http import HttpResponse
 from store.models import *
 from django.db.models import Q,F
 from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
-from django.db.models import Value,Func
+from django.db.models import Value,Func,ExpressionWrapper,DecimalField
 from django.db.models.functions import Concat
-
+from tags.models import TagItem
+from django.contrib.contenttypes.models import ContentType
 
 # Create your views here.
 
@@ -94,14 +95,32 @@ def hello(request):
     
     #annotations...
     # queryset = Customer.objects.annotate(is_new=Value(True)) #this will add the new column called is_new=True
-    queryset = Customer.objects.annotate(new_id=F('id') + 5)
+    # queryset = Customer.objects.annotate(new_id=F('id') + 5)
     
     
     #Func
     # queryset = Customer.objects.annotate(full_name=Func(F('first_name'), Value(' '), F('last_name'),function='CONCAT'))
-    queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
+    # queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
+    
+    #grouping the data..
+    # queryset = Customer.objects.annotate(order_count = Count('order'))    
+    
+    # from django.db.models import Count as c
+    # queryset = Customer.objects.annotate(order_count = c('order'))
+    
+    #expression wrappers...
+    # discounted_price = ExpressionWrapper(F('unit_price')*0.9,output_field=DecimalField())
+    # queryset = Product.objects.annotate(discounted_price=discounted_price)
 
-
+    #generic relationships..
+    content_type = ContentType.objects.get_for_model(Product)
+    queryset = TagItem.objects.select_related('tag')\
+                .filter(
+                    content_type=content_type,
+                    object_id = 1
+                )
+    
+    
     return render(request,template_name='hello.html',context={'orders':queryset})
 
 
