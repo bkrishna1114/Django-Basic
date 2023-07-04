@@ -5,7 +5,7 @@ from django.db.models import Q,F
 from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
 from django.db.models import Value,Func
 from django.db.models.functions import Concat
-
+from tags.models import TaggedItem,Tag
 
 # Create your views here.
 
@@ -94,12 +94,16 @@ def hello(request):
     
     #annotations...
     # queryset = Customer.objects.annotate(is_new=Value(True)) #this will add the new column called is_new=True
-    queryset = Customer.objects.annotate(new_id=F('id') + 5)
+    # queryset = Customer.objects.annotate(new_id=F('id') + 5)
     
     
     #Func
     # queryset = Customer.objects.annotate(full_name=Func(F('first_name'), Value(' '), F('last_name'),function='CONCAT'))
-    queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
+    # queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
+
+
+    #get tagged item..
+    queryset = TaggedItem.objects.get_tags_for(Product,1)
 
 
     return render(request,template_name='hello.html',context={'orders':queryset})
