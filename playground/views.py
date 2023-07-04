@@ -103,10 +103,31 @@ def hello(request):
 
 
     #get tagged item..
-    queryset = TaggedItem.objects.get_tags_for(Product,1)
+    # queryset = TaggedItem.objects.get_tags_for(Product,1)
 
 
-    return render(request,template_name='hello.html',context={'orders':queryset})
+    # #insert record into database...
+    # collection = Collection()
+    # collection.title ='Toys'
+    # collection.featured_product = None  # or  collection.featured_product_id = 1
+    # collection.save() 
+
+    #update
+    # collection = Collection(pk=13)
+    # collection.title ='Toys'
+    # collection.featured_product = None  # or  collection.featured_product_id = 1
+    # collection.save()
+
+    #update 2
+    # Collection.objects.filter(pk=12).update(featured_product=1)
+
+
+    #delete objects..
+    collection = Collection(pk=12)
+    collection.delete()   #or Collection.objects.filter(id__gt=5).delete()
+
+
+    return render(request,template_name='hello.html',context={'orders':'saved'})
 
 
 def practice(request):
