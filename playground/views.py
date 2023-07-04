@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from store.models import *
 from django.db.models import Q,F
 from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
-from django.db.models import Value,Func
+from django.db.models import Value,Func,ExpressionWrapper,DecimalField
 from django.db.models.functions import Concat
 from tags.models import TaggedItem,Tag
 
