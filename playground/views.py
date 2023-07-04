@@ -5,8 +5,7 @@ from django.db.models import Q,F
 from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
 from django.db.models import Value,Func,ExpressionWrapper,DecimalField
 from django.db.models.functions import Concat
-from tags.models import TagItem
-from django.contrib.contenttypes.models import ContentType
+from tags.models import TaggedItem,Tag
 
 # Create your views here.
 
@@ -101,27 +100,34 @@ def hello(request):
     #Func
     # queryset = Customer.objects.annotate(full_name=Func(F('first_name'), Value(' '), F('last_name'),function='CONCAT'))
     # queryset = Customer.objects.annotate(full_name= Concat('first_name',Value(' '),'last_name'))
-    
-    #grouping the data..
-    # queryset = Customer.objects.annotate(order_count = Count('order'))    
-    
-    # from django.db.models import Count as c
-    # queryset = Customer.objects.annotate(order_count = c('order'))
-    
-    #expression wrappers...
-    # discounted_price = ExpressionWrapper(F('unit_price')*0.9,output_field=DecimalField())
-    # queryset = Product.objects.annotate(discounted_price=discounted_price)
 
-    #generic relationships..
-    content_type = ContentType.objects.get_for_model(Product)
-    queryset = TagItem.objects.select_related('tag')\
-                .filter(
-                    content_type=content_type,
-                    object_id = 1
-                )
-    
-    
-    return render(request,template_name='hello.html',context={'orders':queryset})
+
+    #get tagged item..
+    # queryset = TaggedItem.objects.get_tags_for(Product,1)
+
+
+    # #insert record into database...
+    # collection = Collection()
+    # collection.title ='Toys'
+    # collection.featured_product = None  # or  collection.featured_product_id = 1
+    # collection.save() 
+
+    #update
+    # collection = Collection(pk=13)
+    # collection.title ='Toys'
+    # collection.featured_product = None  # or  collection.featured_product_id = 1
+    # collection.save()
+
+    #update 2
+    # Collection.objects.filter(pk=12).update(featured_product=1)
+
+
+    #delete objects..
+    collection = Collection(pk=12)
+    collection.delete()   #or Collection.objects.filter(id__gt=5).delete()
+
+
+    return render(request,template_name='hello.html',context={'orders':'saved'})
 
 
 def practice(request):
