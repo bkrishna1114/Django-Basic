@@ -6,7 +6,8 @@ from django.db.models.aggregates import Count,Max,Min,Avg,StdDev,Variance,Sum
 from django.db.models import Value,Func,ExpressionWrapper,DecimalField
 from django.db.models.functions import Concat
 from tags.models import TaggedItem,Tag
-
+from django.db import transaction
+from django.db import connection
 # Create your views here.
 
 # def call():
@@ -123,11 +124,33 @@ def hello(request):
 
 
     #delete objects..
-    collection = Collection(pk=12)
-    collection.delete()   #or Collection.objects.filter(id__gt=5).delete()
+    # collection = Collection(pk=12)
+    # collection.delete()   #or Collection.objects.filter(id__gt=5).delete()
 
+    #transactions..
+    # with transaction.atomic():
+    #     order = Order()
+    #     order.customer_id = 1
+    #     order.save()
 
-    return render(request,template_name='hello.html',context={'orders':'saved'})
+    #     item = OrderItem()
+    #     item.order = order
+    #     item.product_id = 1
+    #     item.quantity = 1
+    #     item.unit_price =10
+    #     item.save()
+
+    #execute raw sequel queries...
+    # queryset= Product.objects.raw('SELECT * FROM store_product')
+
+    #connection method
+    cur = connection.cursor()
+    cur.execute('select * from store_order')
+    cur.close()  
+
+    queryset = cur
+
+    return render(request,template_name='hello.html',context={'orders':list(queryset)})
 
 
 def practice(request):

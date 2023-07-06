@@ -12,6 +12,13 @@ class Collection(models.Model):
     title = models.CharField(max_length=255)
     featured_product = models.ForeignKey('Product',on_delete=models.SET_NULL,null=True,related_name='+')
 
+    def __str__(self) -> str:
+        return self.title  #this will give the title in admin site
+    
+
+    class Meta:
+        ordering = ['title']
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -21,6 +28,13 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT) #protect the product on deleteing the collections
     promotions = models.ManyToManyField(Promotion)
+
+    def __str__(self) -> str:
+        return self.title
+    
+    class Meta:
+        ordering = ['title']
+        
 #creating the Customer Model...
 class Customer(models.Model):
     membership_bonze,membership_silver,membership_gold = 'B','S','G'
@@ -41,6 +55,12 @@ class Customer(models.Model):
     #     indexes = [
     #         models.Index(fields=['last_name','first_name','email']) #his will creat the index in the database in unique
     #     ]
+    def __str__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
+    
+    class Meta:
+        ordering = ['first_name','last_name']
+
 class Order(models.Model):
     complete,failed,pending = 'C','F','P'
     PAYMENT_CHOICES = [
@@ -51,6 +71,7 @@ class Order(models.Model):
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(max_length=1,choices=PAYMENT_CHOICES,default=pending)
     customer = models.ForeignKey(Customer,on_delete=models.PROTECT)
+
 
 class Addresss(models.Model):
     street = models.CharField(max_length=255)
