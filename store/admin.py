@@ -7,6 +7,8 @@ from django.db.models.aggregates import Count
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
 
+
+
 #creating custom filere and use it in another class..
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
@@ -80,11 +82,19 @@ class CustomerAdmin(admin.ModelAdmin):
 
 
 #setting up order page...
+class OrderItemInline(admin.TabularInline):
+    model = models.OrderItem
+    autocomplete_fields = ['product']
+    extra = 0
+    min_num =1 
+    max_num = 3
+
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display =['id','placed_at','payment_status','customer']
     list_per_page = 10
     autocomplete_fields = ['customer']
+    inlines = [OrderItemInline]
 
 # Register your models here.
 @admin.register(models.Collection)
