@@ -1,6 +1,7 @@
 from decimal import Decimal
 from rest_framework import serializers
 from store.models import Product,Collection
+from django.db.models.aggregates import Count
 
 # class CollectionSerializer(serializers.Serializer):
 class CollectionSerializer(serializers.ModelSerializer): #useed model serializer
@@ -8,8 +9,9 @@ class CollectionSerializer(serializers.ModelSerializer): #useed model serializer
     # title = serializers.CharField(max_length=255)
     class Meta:
         model = Collection
-        fields = ['id','title']
+        fields = ['id','title','products_count']
 
+    products_count = serializers.IntegerField(read_only=True) #it iwll prevent the post and put method
     
 # class ProductSerializers(serializers.Serializer):
 class ProductSerializer(serializers.ModelSerializer):
