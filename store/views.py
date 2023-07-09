@@ -3,25 +3,26 @@ from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from . models import Collection, Product ,OrderItem
-from .serializers import CollectionSerializer, ProductSerializer
+from . models import Collection, Product ,OrderItem, Review
+from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer
 from django.db.models.aggregates import Count
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin,CreateModelMixin
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
+from django.db.models import F
 
 #Model viewset - These are responsibel for creating the url directly with routers by registering..
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'id'
+    # lookup_field = 'id'
 
     def get_serializer_context(self):
         return {"request":self.request} #definying the context here..
     
     def destroy(self, request, *args, **kwargs):
-         if OrderItem.objects.filter(product_id=kwargs['id']).count()>0:
+         if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
               return Response({'error':"product is associated with another item"},status=status.HTTP_405_METHOD_NOT_ALLOWED)
          return super().destroy(request, *args, **kwargs)
     
@@ -35,8 +36,19 @@ class CollectionViewSet(ModelViewSet):
         if Product.objects.filter(collection_id=kwargs['id']).count()>0:
             return Response({'error':'collection cannot be deleted becuase it inclued one or more products'},status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
-
     
+class ReviewsViewSet(ModelViewSet):
+    # queryset = Review.objects.all() 
+    serializer_class = ReviewSerializer
+
+    #over write the queryset..
+    def get_queryset(self):
+        return Review.objects.select_related('product').filter(product_id=self.kwargs['product_pk']) #it will select same product reviews every time..
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
+
 #create ListCreateAPIView class based view...
 # class ProductList(ListCreateAPIView):
 #     queryset = Product.objects.select_related('collection').all()

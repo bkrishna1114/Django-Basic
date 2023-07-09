@@ -1,6 +1,6 @@
 from decimal import Decimal
 from rest_framework import serializers
-from store.models import Product,Collection
+from store.models import Product,Collection, Review
 from django.db.models.aggregates import Count
 
 # class CollectionSerializer(serializers.Serializer):
@@ -31,5 +31,17 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def PriceWithTax(self,product:Product):
         return round(product.unit_price + (product.unit_price)/ (Decimal(18)),2) #returning unit prics + gst
-        
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='product.title',read_only=True) #get the title field
+    class Meta:
+        model = Review
+        fields = ['id','title','date','name','description']
+
+
+    #manully sending product_id automatically...here..
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return Review.objects.create(product_id=product_id,**validated_data)
     
