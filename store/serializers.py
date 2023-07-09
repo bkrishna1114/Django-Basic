@@ -1,6 +1,7 @@
 from decimal import Decimal
 from rest_framework import serializers
-from store.models import Product,Collection
+from store.models import Product,Collection, Review
+from django.db.models.aggregates import Count
 
 # class CollectionSerializer(serializers.Serializer):
 class CollectionSerializer(serializers.ModelSerializer): #useed model serializer
@@ -8,8 +9,9 @@ class CollectionSerializer(serializers.ModelSerializer): #useed model serializer
     # title = serializers.CharField(max_length=255)
     class Meta:
         model = Collection
-        fields = ['id','title']
+        fields = ['id','title','products_count']
 
+    products_count = serializers.IntegerField(read_only=True) #it iwll prevent the post and put method
     
 # class ProductSerializers(serializers.Serializer):
 class ProductSerializer(serializers.ModelSerializer):
@@ -29,5 +31,17 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def PriceWithTax(self,product:Product):
         return round(product.unit_price + (product.unit_price)/ (Decimal(18)),2) #returning unit prics + gst
-        
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='product.title',read_only=True) #get the title field
+    class Meta:
+        model = Review
+        fields = ['id','title','date','name','description']
+
+
+    #manully sending product_id automatically...here..
+    def create(self, validated_data):
+        product_id = self.context['product_id']
+        return Review.objects.create(product_id=product_id,**validated_data)
     
