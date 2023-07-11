@@ -6,12 +6,13 @@ from pprint import pprint
 
 #nested routers..
 router = routers.DefaultRouter()
-router.register('products',views.ProductViewSet)
+router.register('products',views.ProductViewSet,basename='products')
 router.register('collections',views.CollectionViewSet)
 
-#creating chils routers..
+#creating chilD routers..
 product_router = routers.NestedDefaultRouter(parent_router=router,parent_prefix='products',lookup='product')
 product_router.register('reviews',viewset=views.ReviewsViewSet,basename='product-reviews')
+pprint(router.urls) #printing the urls..
 
 urlpatterns = router.urls + product_router.urls  
 
