@@ -40,7 +40,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['id','title','date','name','description']
 
 
-    #manully sending product_id automatically...here..
+    #manully sending product_id to review product id here...
     def create(self, validated_data):
         product_id = self.context['product_id']
         return Review.objects.create(product_id=product_id,**validated_data)
